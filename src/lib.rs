@@ -1,5 +1,6 @@
 use resast::prelude::*;
 use ressa::Parser;
+#[cfg(target_arch = "wasm32")]
 use serde_derive::Serialize;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
@@ -7,7 +8,8 @@ use wasm_bindgen::prelude::*;
 pub use ressa::Error;
 
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
-#[derive(Debug, Default, Clone, Serialize)]
+#[cfg_attr(target_arch = "wasm32", derive(Debug, Default, Clone, Serialize))]
+#[cfg_attr(not(target_arch = "wasm32"), derive(Debug, Default, Clone))]
 pub struct Found {
     strings: Vec<String>,
     expressions: Vec<String>,
@@ -358,6 +360,31 @@ pub fn find(source: &str) -> Result<Found, Error> {
 
 pub fn detective(source: &str) -> Result<Vec<String>, Error> {
     Detective::new().find(source).map(|res| res.strings)
+}
+
+#[cfg(garget_arch = "wasm32")]
+pub use wasm::*;
+
+#[cfg(target_arch = "wasm32")]
+mod wasm {
+    // use wasm_bindgen::prelude::*;
+    use super::*;
+
+    fn convert_err(err: Error) -> JsValue {
+        JsValue::from_str(&format!("{}", err))
+    }
+
+    #[wasm_bindgen(js_name = "find")]
+    pub fn js_find(source: &str) -> Result<JsValue, JsValue> {
+        find(source).map(|found| JsValue::from_serde(&found).unwrap()).map_err(convert_err)
+    }
+
+    #[wasm_bindgen(js_name = "detective")]
+    pub fn js_detective(source: &str) -> Result<JsValue, JsValue> {
+        detective(source)
+            .map(|list| JsValue::from_serde(&list).unwrap())
+            .map_err(convert_err)
+    }
 }
 
 #[cfg(test)]
