@@ -17,7 +17,7 @@ fn main() {
     };
 
     let source = std::str::from_utf8(&source).unwrap();
-    let result = match detective(source) {
+    let result = match detective(source, &Default::default()) {
         Ok(result) => result,
         Err(error) => err(&error.to_string()),
     };

@@ -8,6 +8,31 @@ use wasm_bindgen::prelude::*;
 pub use ressa::Error;
 
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
+#[derive(Debug, Clone)]
+pub struct Options {
+    word: String,
+}
+
+impl Default for Options {
+    fn default() -> Self {
+        Self {
+            word: "require".to_string(),
+        }
+    }
+}
+
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
+impl Options {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn word(mut self, word: &str) -> Self {
+        self.word = word.to_string();
+        self
+    }
+}
+
 #[cfg_attr(target_arch = "wasm32", derive(Debug, Default, Clone, Serialize))]
 #[cfg_attr(not(target_arch = "wasm32"), derive(Debug, Default, Clone))]
 pub struct Found {
@@ -15,19 +40,23 @@ pub struct Found {
     expressions: Vec<String>,
 }
 
-#[derive(Debug, Default)]
-struct Detective {
+#[derive(Debug)]
+struct Detective<'a> {
+    options: &'a Options,
     found: Found,
 }
 
-impl Detective {
-    fn new() -> Self {
-        Default::default()
+impl<'a> Detective<'a> {
+    fn new(options: &'a Options) -> Self {
+        Self {
+            options,
+            found: Default::default(),
+        }
     }
 
     fn check(&mut self, callee: &Expr<'_>, args: &[Expr<'_>]) -> bool {
         if let Expr::Ident(ref ident) = callee {
-            if ident.name == "require" {
+            if ident.name == self.options.word {
                 match args.get(0) {
                     Some(Expr::Lit(Lit::String(string))) => {
                         self.found.strings.push(string.clone_inner().to_string());
@@ -337,7 +366,7 @@ impl Detective {
     }
 
     fn find(mut self, source: &str) -> Result<Found, Error> {
-        if !source.contains("require") {
+        if !source.contains(&self.options.word) {
             return Ok(self.found);
         }
 
@@ -354,12 +383,12 @@ impl Detective {
     }
 }
 
-pub fn find(source: &str) -> Result<Found, Error> {
-    Detective::new().find(source)
+pub fn find(source: &str, options: &Options) -> Result<Found, Error> {
+    Detective::new(options).find(source)
 }
 
-pub fn detective(source: &str) -> Result<Vec<String>, Error> {
-    Detective::new().find(source).map(|res| res.strings)
+pub fn detective(source: &str, options: &Options) -> Result<Vec<String>, Error> {
+    Detective::new(options).find(source).map(|res| res.strings)
 }
 
 #[cfg(garget_arch = "wasm32")]
@@ -375,13 +404,15 @@ mod wasm {
     }
 
     #[wasm_bindgen(js_name = "find")]
-    pub fn js_find(source: &str) -> Result<JsValue, JsValue> {
-        find(source).map(|found| JsValue::from_serde(&found).unwrap()).map_err(convert_err)
+    pub fn js_find(source: &str, options: Options) -> Result<JsValue, JsValue> {
+        find(source, &options)
+            .map(|found| JsValue::from_serde(&found).unwrap())
+            .map_err(convert_err)
     }
 
     #[wasm_bindgen(js_name = "detective")]
-    pub fn js_detective(source: &str) -> Result<JsValue, JsValue> {
-        detective(source)
+    pub fn js_detective(source: &str, options: Options) -> Result<JsValue, JsValue> {
+        detective(source, &options)
             .map(|list| JsValue::from_serde(&list).unwrap())
             .map_err(convert_err)
     }
@@ -400,6 +431,7 @@ mod tests {
             require('c' + x);
             var moo = require('d' + y).moo;
         "#,
+            &Default::default(),
         )
         .unwrap();
 
@@ -415,6 +447,7 @@ mod tests {
             require('b').hello()
             require('a')
         "#,
+            &Default::default(),
         )
         .unwrap();
 
@@ -470,7 +503,7 @@ mod tests {
         ];
 
         for source in sources.iter() {
-            let found = find(source).unwrap();
+            let found = find(source, &Default::default()).unwrap();
             assert_eq!(found.strings, vec!["a"]);
             assert!(found.expressions.is_empty());
         }
@@ -486,6 +519,7 @@ mod tests {
                 }
             }
         "#,
+            &Default::default(),
         )
         .unwrap();
         assert!(found.strings.is_empty());
@@ -501,6 +535,7 @@ mod tests {
             } catch {
             }
         "#,
+            &Default::default(),
         )
         .unwrap();
         assert!(found.strings.is_empty());
@@ -517,6 +552,7 @@ mod tests {
                 var b = require('b');
             }
         "#,
+            &Default::default(),
         )
         .unwrap();
         assert_eq!(found.strings, vec!["a", "b"]);
@@ -533,6 +569,7 @@ mod tests {
               yield require('b');
             }
         "#,
+            &Default::default(),
         )
         .unwrap();
         assert_eq!(found.strings, vec!["a", "b"]);
@@ -565,6 +602,7 @@ mod tests {
                 );
             }
         "#,
+            &Default::default(),
         )
         .unwrap();
         assert_eq!(found.strings, vec!["a", "b", "c"]);
@@ -584,6 +622,7 @@ mod tests {
             var spread = { ...obj }
             var { foo, ...rest } = obj
         "#,
+            &Default::default(),
         )
         .unwrap();
         assert_eq!(found.strings, vec!["a", "b", "c"]);
@@ -598,6 +637,7 @@ mod tests {
 
             return
         "#,
+            &Default::default(),
         )
         .unwrap();
         assert_eq!(found.strings, vec!["a"]);
@@ -608,17 +648,18 @@ mod tests {
     fn set_in_object_pat() {
         let found = find(
             r#"
-            var a = require('a');
-            var b = require('b');
-            var c = require('c');
+            var a = load('a');
+            var b = load('b');
+            var c = load('c');
             var abc = a.b(c);
 
-            function require2({set = 'hello'}) {
-                return require('tt');
+            function load2({set = 'hello'}) {
+                return load('tt');
             }
 
-            var loadUse = require2();
+            var loadUse = load2();
         "#,
+            &Options::new().word("load"),
         )
         .unwrap();
         assert_eq!(found.strings, vec!["a", "b", "c", "tt"]);
@@ -634,6 +675,7 @@ mod tests {
             var b = require('b');
             var c = require('c');
         "#,
+            &Default::default(),
         )
         .unwrap();
         assert_eq!(found.strings, vec!["a", "b", "c"]);
@@ -648,6 +690,7 @@ mod tests {
 
             require('./foo')
         "#,
+            &Default::default(),
         )
         .unwrap();
         assert_eq!(found.strings, vec!["./foo"]);
@@ -672,6 +715,35 @@ mod tests {
 
             var EventEmitter2 = require('events2').EventEmitter();
         "#,
+            &Default::default(),
+        )
+        .unwrap();
+        assert_eq!(
+            found.strings,
+            vec!["a", "b", "c", "events", "doom", "y", "events2"]
+        );
+        assert!(found.expressions.is_empty());
+    }
+
+    #[test]
+    fn word() {
+        let found = find(
+            r#"
+            var a = load('a');
+            var b = load('b');
+            var c = load('c');
+            var abc = a.b(c);
+
+            var EventEmitter = load('events').EventEmitter;
+
+            var x = load('doom')(5,6,7);
+            x(8,9);
+            c.load('notthis');
+            var y = load('y') * 100;
+
+            var EventEmitter2 = load('events2').EventEmitter();
+        "#,
+            &Options::new().word("load"),
         )
         .unwrap();
         assert_eq!(
@@ -690,6 +762,7 @@ mod tests {
                 var b = yield require('c')(a);
             })();
         "#,
+            &Default::default(),
         )
         .unwrap();
         assert_eq!(found.strings, vec!["a", "c"]);
