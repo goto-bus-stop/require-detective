@@ -1,0 +1,32 @@
+{
+  "name": "detective-wasm",
+  "description": "find require() calls in commonjs modules, quickly using webassembly",
+  "version": "0.0.0",
+  "author": "Renée Kooi <renee@kooi.me>",
+  "bugs": {
+    "url": "https://github.com/goto-bus-stop/require-detective/issues"
+  },
+  "devDependencies": {
+    "tap": "^14.6.1"
+  },
+  "homepage": "https://github.com/goto-bus-stop/require-detective",
+  "keywords": [
+    "analyze",
+    "ast",
+    "commonjs",
+    "modules",
+    "require",
+    "source",
+    "wasm",
+    "webassembly"
+  ],
+  "license": "Apache-2.0",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/goto-bus-stop/require-detective.git"
+  },
+  "scripts": {
+    "test": "tap test/*.js"
+  }
+}
