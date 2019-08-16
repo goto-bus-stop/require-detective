@@ -4,7 +4,7 @@ rust:
 cache: rust
 
 install:
-  - cargo install wasm-pack
+  - 'curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh'
   - nvm install 'lts/*'
   - npm install
   - cargo build --verbose
