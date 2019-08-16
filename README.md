@@ -4,7 +4,7 @@ find require() calls in commonjs modules, quickly using webassembly
 
 This is a wasm-based alternative to the [detective](https://github.com/browserify/detective) module used in browserify, built on the [RESSA](https://github.com/FreeMasen/RESSA) parser. It can be used as a Rust crate and as a CommonJS module.
 
-[Install](#install) - [Usage](#usage) - [License: Apache-2.0](#license)
+Node.js: [Install](#nodejs-installation) - [Usage](#nodejs-usage) - Rust: [Install](#rust-installation) - [Usage](#rust-usage) - [License: Apache-2.0](#license)
 
 [![npm][npm-image]][npm-url]
 [![travis][travis-image]][travis-url]
