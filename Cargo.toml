@@ -1,0 +1,21 @@
+[package]
+name = "require-detective"
+version = "0.1.0"
+authors = ["Renée Kooi <renee@kooi.me>"]
+edition = "2018"
+license = "Apache-2.0"
+description = "Find require calls in a CommonJS module"
+repository = "https://github.com/goto-bus-stop/require-detective"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+ress = "^0.7.0"
+ressa = "^0.7.0-beta-5"
+resast = "^0.4.0-beta-3"
+serde = "1"
+serde_derive = "1"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "^0.2.49"
