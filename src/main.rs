@@ -8,7 +8,7 @@ fn err(message: &str) -> ! {
 fn main() {
     let file = match std::env::args().nth(1) {
         Some(file) => file,
-        None => err(""),
+        None => err("missing file arg"),
     };
 
     let source = match std::fs::read(file) {
