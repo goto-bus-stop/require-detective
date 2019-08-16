@@ -8,7 +8,7 @@ install:
   - nvm install 'lts/*'
   - npm install
   - cargo build --verbose
-  - wasm-pack build --target nodejs
+  - wasm-pack build --target nodejs -- --features npm
 
 script:
   - cargo test --all --verbose

@@ -1,13 +1,13 @@
 use resast::prelude::*;
 use ressa::Parser;
-#[cfg(target_arch = "wasm32")]
+#[cfg(feature = "npm")]
 use serde_derive::Serialize;
-#[cfg(target_arch = "wasm32")]
+#[cfg(feature = "npm")]
 use wasm_bindgen::prelude::*;
 
 pub use ressa::Error;
 
-#[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
+#[cfg_attr(feature = "npm", wasm_bindgen)]
 #[derive(Debug, Clone)]
 pub struct Options {
     word: String,
@@ -21,7 +21,7 @@ impl Default for Options {
     }
 }
 
-#[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
+#[cfg_attr(feature = "npm", wasm_bindgen)]
 impl Options {
     pub fn new() -> Self {
         Self::default()
@@ -33,8 +33,8 @@ impl Options {
     }
 }
 
-#[cfg_attr(target_arch = "wasm32", derive(Debug, Default, Clone, Serialize))]
-#[cfg_attr(not(target_arch = "wasm32"), derive(Debug, Default, Clone))]
+#[cfg_attr(feature = "npm", derive(Debug, Default, Clone, Serialize))]
+#[cfg_attr(not(feature = "npm"), derive(Debug, Default, Clone))]
 pub struct Found {
     strings: Vec<String>,
     expressions: Vec<String>,
@@ -394,7 +394,7 @@ pub fn detective(source: &str, options: &Options) -> Result<Vec<String>, Error> 
 #[cfg(garget_arch = "wasm32")]
 pub use wasm::*;
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(feature = "npm")]
 mod wasm {
     // use wasm_bindgen::prelude::*;
     use super::*;
