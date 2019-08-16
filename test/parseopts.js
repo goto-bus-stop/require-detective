@@ -3,7 +3,7 @@ var detective = require('../');
 var fs = require('fs');
 var src = fs.readFileSync(__dirname + '/files/both.js');
 
-test('nodes specified in opts and parseopts { range: true }', function (t) {
+test('nodes specified in opts and parseopts { range: true }', { skip: 'nodes not supported' }, function (t) {
     var modules = detective.find(src, { nodes: true, parse: { range: true } });
     t.deepEqual(modules.strings, [ 'a', 'b' ]);
     t.deepEqual(modules.expressions, [ "'c' + x", "'d' + y" ]);
@@ -21,7 +21,7 @@ test('nodes specified in opts and parseopts { range: true }', function (t) {
     t.end();
 });
 
-test('nodes specified in opts and parseopts { range: false }', function (t) {
+test('nodes specified in opts and parseopts { range: false }', { skip: 'nodes not supported' }, function (t) {
     var modules = detective.find(src, { nodes: true, parse: { range: false } });
     t.deepEqual(modules.strings, [ 'a', 'b' ]);
     t.deepEqual(modules.expressions, [ "'c' + x", "'d' + y" ]);
@@ -37,7 +37,7 @@ test('nodes specified in opts and parseopts { range: false }', function (t) {
     t.end();
 });
 
-test('nodes specified in opts and parseopts { range: true, loc: true }', function (t) {
+test('nodes specified in opts and parseopts { range: true, loc: true }', { skip: 'nodes not supported' }, function (t) {
     var modules = detective.find(src, { nodes: true, parse: { range: true, loc: true } });
     t.deepEqual(modules.strings, [ 'a', 'b' ]);
     t.deepEqual(modules.expressions, [ "'c' + x", "'d' + y" ]);
