@@ -1,9 +1,14 @@
 language: rust
 rust:
   - stable
-before_script:
+cache: rust
+
+install:
+  - cargo install wasm-pack
   - nvm install 'lts/*'
   - npm install
+  - cargo build --verbose
+  - wasm-pack --target nodejs
 
 script:
   - cargo test --all --verbose
