@@ -1,0 +1,10 @@
+language: rust
+rust:
+  - stable
+before_script:
+  - nvm install 'lts/*'
+  - npm install
+
+script:
+  - cargo test --all --verbose
+  - npm test
