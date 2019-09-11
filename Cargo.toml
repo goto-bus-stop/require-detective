@@ -12,7 +12,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 ress = "^0.7.3"
-ressa = "0.7.0-beta-6"
+ressa = "0.7.0-beta-7"
 resast = "^0.4.0"
 serde = { version = "1", optional = true }
 serde_derive = { version = "1", optional = true }
