@@ -27,6 +27,7 @@
     "url": "https://github.com/goto-bus-stop/require-detective.git"
   },
   "scripts": {
+    "build": "wasm-pack build -t nodejs -- --features npm",
     "test": "tap test/*.js"
   }
 }
