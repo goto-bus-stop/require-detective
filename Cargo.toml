@@ -11,11 +11,11 @@ repository = "https://github.com/goto-bus-stop/require-detective"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-ressa = "0.7.0-beta-7"
-resast = "^0.4.0"
+ressa = "0.7.0"
+resast = "0.4.1"
 serde = { version = "1", optional = true }
 serde_derive = { version = "1", optional = true }
-wasm-bindgen = { version = "^0.2.49", features = ["serde-serialize"], optional = true }
+wasm-bindgen = { version = "0.2.49", features = ["serde-serialize"], optional = true }
 
 [features]
 npm = ["serde", "serde_derive", "wasm-bindgen"]

@@ -36,8 +36,8 @@ impl Options {
 #[cfg_attr(feature = "npm", derive(Debug, Default, Clone, Serialize))]
 #[cfg_attr(not(feature = "npm"), derive(Debug, Default, Clone))]
 pub struct Found {
-    strings: Vec<String>,
-    expressions: Vec<String>,
+    pub strings: Vec<String>,
+    pub expressions: Vec<String>,
 }
 
 #[derive(Debug)]
