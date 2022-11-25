@@ -11,7 +11,7 @@ repository = "https://github.com/goto-bus-stop/require-detective"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-ressa = "0.7.0"
+ressa = "0.8.0"
 resast = "0.4.1"
 serde = { version = "1", optional = true }
 serde_derive = { version = "1", optional = true }
